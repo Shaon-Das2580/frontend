@@ -1,87 +1,91 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
+import "./AuthPage.css";
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Signup
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    username: "", // Only for signup
-    role: "consumer", // Default role
-  });
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [role, setRole] = useState("consumer");
+  const [message, setMessage] = useState("");
 
-  const handleToggle = () => {
-    setIsLogin(!isLogin);
-    setFormData({ email: "", password: "", username: "", role: "consumer" });
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  const endpoint = isLogin ? "/login" : "/signup";
-  try {
-    const response = await axios.post(`http://127.0.0.1:5000${endpoint}`, formData);
-    if (isLogin) {
-      localStorage.setItem("token", response.data.token);
-      alert("Login successful!");
-    } else {
-      alert("Signup successful! You can now log in.");
-      setIsLogin(true);
+  const handleSignup = async () => {
+    if (!username || !email || !password) {
+      setMessage("All fields are required!");
+      return;
     }
-  } catch (err) {
-    console.error("Error response:", err.response); // Log the error response
-    alert(err.response?.data?.error || "Something went wrong!");
-  }
-};
+    try {
+      await api.post("/signup", { username, email, password, role });
+      setMessage("Signup successful! Please log in.");
+      setIsLogin(true);
+    } catch (err) {
+      setMessage("Signup failed. Please try again.");
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const response = await api.post("/login", { email, password });
+      localStorage.setItem("token", response.data.token);
+      setMessage("Login successful!");
+      window.location.href = "/videos";
+    } catch (error) {
+      setMessage("Failed to login. Please check your credentials.");
+    }
+  };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "0 auto", textAlign: "center" }}>
-      <h1>{isLogin ? "Login" : "Signup"}</h1>
-      <button onClick={handleToggle}>
-        {isLogin ? "Switch to Signup" : "Switch to Login"}
-      </button>
-      <form onSubmit={handleSubmit}>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h1 className="auth-title">{isLogin ? "Login" : "Signup"}</h1>
+        {message && <p className="auth-message">{message}</p>}
         {!isLogin && (
           <>
             <input
               type="text"
-              name="username"
               placeholder="Username"
-              value={formData.username}
-              onChange={handleChange}
-              required={!isLogin}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="auth-input"
             />
-            <br />
-            <select name="role" value={formData.role} onChange={handleChange}>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="auth-select"
+            >
               <option value="consumer">Consumer</option>
               <option value="creator">Creator</option>
             </select>
-            <br />
           </>
         )}
         <input
           type="email"
-          name="email"
           placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="auth-input"
         />
-        <br />
         <input
           type="password"
-          name="password"
           placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="auth-input"
         />
-        <br />
-        <button type="submit">{isLogin ? "Login" : "Signup"}</button>
-      </form>
+        <button
+          onClick={isLogin ? handleLogin : handleSignup}
+          className="auth-button"
+        >
+          {isLogin ? "Login" : "Signup"}
+        </button>
+        <button
+          onClick={() => setIsLogin(!isLogin)}
+          className="auth-toggle-button"
+        >
+          {isLogin ? "Switch to Signup" : "Switch to Login"}
+        </button>
+      </div>
     </div>
   );
 };

@@ -1,19 +1,22 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./components/AuthPage";
+import Navbar from "./components/Navbar";
+import VideoListing from "./components/VideoListing";
+import VideoPlayback from "./components/VideoPlayback";
+import VideoUpload from "./components/VideoUpload";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
   return (
     <Router>
+      <Navbar />
       <Routes>
-        {/* Redirect the root route ("/") to the AuthPage */}
         <Route path="/" element={<Navigate to="/auth" replace />} />
-
-        {/* AuthPage for login and signup */}
         <Route path="/auth" element={<AuthPage />} />
-
-        {/* Add more routes here if needed */}
-        {/* Example: <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Route path="/videos" element={<VideoListing />} />
+        <Route path="/videos/:videoId" element={<VideoPlayback />} />
+        <Route path="/upload" element={<VideoUpload />} />
       </Routes>
     </Router>
   );
