@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 import "./VideoListing.css";
@@ -8,38 +8,40 @@ const VideoListing = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-  const delayDebounceFn = setTimeout(() => {
-    if (searchQuery) {
-      handleSearch();
-    } else {
-      fetchVideos();
-    }
-  }, 500); // Add a 500ms delay to debounce the API call
-
-  return () => clearTimeout(delayDebounceFn); // Cleanup timeout
-// eslint-disable-next-line no-use-before-define
-}, [searchQuery, handleSearch]); // Include `handleSearch` here
-
-
-  const fetchVideos = async () => {
+  // Function to fetch all videos
+  const fetchVideos = useCallback(async () => {
     try {
       const response = await api.get("/videos");
       setVideos(response.data);
     } catch (error) {
       console.error("Error fetching videos:", error);
     }
-  };
+  }, []);
 
-  const handleSearch = async () => {
+  // Function to handle video search
+  const handleSearch = useCallback(async () => {
     try {
       const response = await api.get(`/videos/search?q=${searchQuery}`);
       setVideos(response.data);
     } catch (error) {
       console.error("Error searching videos:", error);
     }
-  };
+  }, [searchQuery]);
 
+  // useEffect for handling search or fetching videos
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery) {
+        handleSearch();
+      } else {
+        fetchVideos();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, handleSearch, fetchVideos]);
+
+  // Handle video click
   const handleVideoClick = (videoId) => {
     navigate(`/videos/${videoId}`);
   };

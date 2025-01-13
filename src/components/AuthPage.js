@@ -11,29 +11,33 @@ const AuthPage = () => {
   const [message, setMessage] = useState("");
 
   const handleSignup = async () => {
-    if (!username || !email || !password) {
-      setMessage("All fields are required!");
-      return;
-    }
-    try {
-      await api.post("/signup", { username, email, password, role });
-      setMessage("Signup successful! Please log in.");
-      setIsLogin(true);
-    } catch (err) {
-      setMessage("Signup failed. Please try again.");
-    }
-  };
+  if (!username || !email || !password) {
+    setMessage("All fields are required!");
+    return;
+  }
+  try {
+    const response = await api.post("/signup", { username, email, password, role });
+    console.log("Signup Response:", response);
+    setMessage("Signup successful! Please log in.");
+    setIsLogin(true);
+  } catch (err) {
+    console.error("Signup Error:", err);
+    setMessage("Signup failed. Please try again.");
+  }
+};
 
-  const handleLogin = async () => {
-    try {
-      const response = await api.post("/login", { email, password });
-      localStorage.setItem("token", response.data.token);
-      setMessage("Login successful!");
-      window.location.href = "/videos";
-    } catch (error) {
-      setMessage("Failed to login. Please check your credentials.");
-    }
-  };
+const handleLogin = async () => {
+  try {
+    const response = await api.post("/login", { email, password });
+    console.log("Login Response:", response);
+    localStorage.setItem("token", response.data.token);
+    setMessage("Login successful!");
+    window.location.href = "/videos";
+  } catch (error) {
+    console.error("Login Error:", error);
+    setMessage("Failed to login. Please check your credentials.");
+  }
+};
 
   return (
     <div className="auth-container">
