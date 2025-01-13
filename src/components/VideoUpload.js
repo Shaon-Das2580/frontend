@@ -23,7 +23,7 @@ const VideoUpload = () => {
   };
 
   const handleUpload = async () => {
-    if (role !== "creator") {
+    if (role.trim().toLowerCase() !== "creator") {
       setMessage("Consumers are not eligible for uploading videos.");
       return;
     }
@@ -47,6 +47,7 @@ const VideoUpload = () => {
       setDescription("");
       setFile(null);
     } catch (err) {
+      console.error("Upload error:", err);
       setMessage("Failed to upload video.");
     }
   };
@@ -69,30 +70,23 @@ const VideoUpload = () => {
         placeholder="Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        disabled={role !== "creator"} // Disable input if user is not a creator
       />
       <textarea
         className="upload-textarea"
         placeholder="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        disabled={role !== "creator"} // Disable textarea if user is not a creator
       />
       <input
         className="upload-file-input"
         type="file"
         onChange={(e) => setFile(e.target.files[0])}
-        disabled={role !== "creator"} // Disable file input if user is not a creator
       />
-      <button
-        className="upload-button"
-        onClick={handleUpload}
-        disabled={role !== "creator"} // Disable button if user is not a creator
-      >
+      <button className="upload-button" onClick={handleUpload}>
         Upload
       </button>
 
-      {role !== "creator" && (
+      {role.trim().toLowerCase() !== "creator" && (
         <p className="warning-message">
           Note: Consumers are not eligible for uploading videos.
         </p>
