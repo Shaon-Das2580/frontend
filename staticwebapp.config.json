@@ -1,8 +1,24 @@
 {
   "routes": [
     {
-      "route": "/*",
-      "rewrite": "/index.html"
+      "route": "/auth",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/videos",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/videos/*",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/upload",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/",
+      "redirect": "/auth"
     }
   ]
 }
