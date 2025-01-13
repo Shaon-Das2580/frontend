@@ -14,17 +14,16 @@ const VideoListing = () => {
   }, []);
 
   useEffect(() => {
-    // Trigger search whenever the search query changes
-    const delayDebounceFn = setTimeout(() => {
-      if (searchQuery) {
-        handleSearch();
-      } else {
-        fetchVideos();
-      }
-    }, 500); // Add a 500ms delay to debounce the API call
+  const delayDebounceFn = setTimeout(() => {
+    if (searchQuery) {
+      handleSearch();
+    } else {
+      fetchVideos();
+    }
+  }, 500); // 500ms delay
 
-    return () => clearTimeout(delayDebounceFn); // Cleanup timeout
-  }, [searchQuery]);
+  return () => clearTimeout(delayDebounceFn); // Cleanup timeout
+}, [searchQuery]);
 
   const fetchVideos = async () => {
     try {
