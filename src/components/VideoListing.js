@@ -9,21 +9,18 @@ const VideoListing = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch all videos when the component mounts
-    fetchVideos();
-  }, []);
-
-  useEffect(() => {
   const delayDebounceFn = setTimeout(() => {
     if (searchQuery) {
       handleSearch();
     } else {
       fetchVideos();
     }
-  }, 500); // 500ms delay
+  }, 500); // Add a 500ms delay to debounce the API call
 
   return () => clearTimeout(delayDebounceFn); // Cleanup timeout
-}, [searchQuery]);
+// eslint-disable-next-line no-use-before-define
+}, [searchQuery, handleSearch]); // Include `handleSearch` here
+
 
   const fetchVideos = async () => {
     try {
