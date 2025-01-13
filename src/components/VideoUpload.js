@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import api from "../api";
 import "./VideoUpload.css";
 
@@ -7,27 +7,8 @@ const VideoUpload = () => {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
-  const [role, setRole] = useState(""); // State to store user role
-
-  useEffect(() => {
-    fetchUserRole();
-  }, []);
-
-  const fetchUserRole = async () => {
-    try {
-      const response = await api.get("/auth/user-role"); // Replace with your API endpoint for fetching user role
-      setRole(response.data.role);
-    } catch (err) {
-      console.error("Error fetching user role:", err);
-    }
-  };
 
   const handleUpload = async () => {
-    if (role.trim().toLowerCase() !== "creator") {
-      setMessage("Consumers are not eligible for uploading videos.");
-      return;
-    }
-
     if (!title || !file) {
       setMessage("Title and file are required!");
       return;
@@ -85,12 +66,6 @@ const VideoUpload = () => {
       <button className="upload-button" onClick={handleUpload}>
         Upload
       </button>
-
-      {role.trim().toLowerCase() !== "creator" && (
-        <p className="warning-message">
-          Note: Consumers are not eligible for uploading videos.
-        </p>
-      )}
     </div>
   );
 };
