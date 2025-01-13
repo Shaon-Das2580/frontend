@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api";
 import "./VideoPlayback.css";
@@ -11,28 +11,21 @@ const VideoPlayback = () => {
   const [rating, setRating] = useState(0);
   const [userRating, setUserRating] = useState(0);
 
-  useEffect(() => {
-    fetchVideoDetails();
-    fetchRating();
-  }, [videoId]);
-
-  const fetchVideoDetails = async () => {
+  // Function to fetch video details
+  const fetchVideoDetails = useCallback(async () => {
     try {
       const videoResponse = await api.get(`/videos/${videoId}/play`);
       setVideoUrl(videoResponse.data.url);
 
       const commentsResponse = await api.get(`/videos/${videoId}/comments`);
       setComments(commentsResponse.data);
-
-      const ratingResponse = await api.get(`/videos/${videoId}/rate`);
-      setRating(ratingResponse.data.averageRating || 0);
-      setUserRating(ratingResponse.data.userRating || 0);
     } catch (error) {
       console.error("Error fetching video details:", error);
     }
-  };
+  }, [videoId]);
 
-  const fetchRating = async () => {
+  // Function to fetch ratings
+  const fetchRating = useCallback(async () => {
     try {
       const ratingResponse = await api.get(`/videos/${videoId}/rate`);
       setRating(ratingResponse.data.averageRating || 0);
@@ -40,21 +33,28 @@ const VideoPlayback = () => {
     } catch (error) {
       console.error("Error fetching rating:", error);
     }
-  };
+  }, [videoId]);
 
+  // UseEffect to fetch video details and rating
+  useEffect(() => {
+    fetchVideoDetails();
+    fetchRating();
+  }, [fetchVideoDetails, fetchRating]);
+
+  // Function to add a comment
   const handleAddComment = async () => {
     if (!newComment) return;
 
     try {
       const response = await api.post(`/videos/${videoId}/comments`, { comment: newComment });
-      const newCommentData = response.data;
-      setComments([...comments, newCommentData]);
+      setComments((prevComments) => [...prevComments, response.data]);
       setNewComment("");
     } catch (error) {
       console.error("Error adding comment:", error);
     }
   };
 
+  // Function to rate the video
   const handleRateVideo = async (newRating) => {
     try {
       const response = await api.post(`/videos/${videoId}/rate`, { rating: newRating });
